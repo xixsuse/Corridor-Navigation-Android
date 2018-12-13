@@ -44,7 +44,6 @@ import timber.log.Timber;
 public class MainActivity extends MapContext {
     public ArrayAdapter<String> adapter;
     public AutoCompleteTextView autoCompleteTextView;
-    private ArrayList<String> previous_autocomplete_results;
     private AutoCompleteTextView addressSearchBar;
 
     @Override
@@ -77,12 +76,9 @@ public class MainActivity extends MapContext {
             public void afterTextChanged(Editable s) {
                 if (s.length() > 0) {
                     onSearchStart(s);
-//
                 }
             }
         });
-
-        previous_autocomplete_results = new ArrayList<String>();
     }
 
     public void actionButtonPressed(View view) {
@@ -132,11 +128,8 @@ public class MainActivity extends MapContext {
                                 System.err.println(e.getStackTrace());
                             }
                         }
-//                        add_previous_results(autocomplete_results, addressPart);
                         String[] stockArr = new String[autocomplete_results.size()];
                         stockArr = autocomplete_results.toArray(stockArr);
-//                        previous_autocomplete_results.clear();
-//                        previous_autocomplete_results.addAll(autocomplete_results);
                         adapter.clear();
                         adapter.addAll(stockArr);
                         adapter.notifyDataSetChanged();
@@ -155,15 +148,6 @@ public class MainActivity extends MapContext {
             Timber.e("Error geocoding: " + servicesException.toString());
             servicesException.printStackTrace();
         }
-    }
-
-    private void add_previous_results(ArrayList<String> autocomplete_results, String adressPart) {
-        for (String result : previous_autocomplete_results) {
-            if (result.toLowerCase().startsWith(adressPart.toLowerCase()) && autocomplete_results.size() <= 5 && !autocomplete_results.contains(result)) {
-                autocomplete_results.add(result);
-            }
-        }
-        System.err.println("Yay !");
     }
 
     public void onSearchButtonClicked(View view) {
