@@ -1,52 +1,46 @@
 package amos.corridornavigation.navigationview;
 
-import android.content.SharedPreferences;
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.preference.PreferenceManager;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.view.View;
 
 import com.mapbox.api.directions.v5.models.DirectionsRoute;
-import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.services.android.navigation.ui.v5.NavigationView;
 import com.mapbox.services.android.navigation.ui.v5.NavigationViewOptions;
 import com.mapbox.services.android.navigation.ui.v5.OnNavigationReadyCallback;
-import com.mapbox.services.android.navigation.ui.v5.map.NavigationMapboxMap;
-import com.mapbox.services.android.navigation.ui.v5.route.NavigationMapRoute;
 
 import java.util.ArrayList;
 
-import amos.corridornavigation.MapContext;
 import amos.corridornavigation.R;
 
 public class CorridorNavigationActivity extends AppCompatActivity implements OnNavigationReadyCallback {
 
     NavigationView navigationView;
-
     DirectionsRoute mainDriectionRoute;
     ArrayList<DirectionsRoute> alternativeDirectionsRoutes = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        setTheme(R.style.Theme_AppCompat_NoActionBar);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_navigation);
 
-        mainDriectionRoute = (DirectionsRoute) getIntent().getSerializableExtra("DirectionsRoute_0");
-        //The MainDirectionRoute must be the first in the ArrayList
-        alternativeDirectionsRoutes.add((DirectionsRoute) getIntent().getSerializableExtra("DirectionsRoute_0"));
-        alternativeDirectionsRoutes.add((DirectionsRoute) getIntent().getSerializableExtra("DirectionsRoute_1"));
-        alternativeDirectionsRoutes.add((DirectionsRoute) getIntent().getSerializableExtra("DirectionsRoute_2"));
+            setTheme(R.style.Theme_AppCompat_NoActionBar);
+            setContentView(R.layout.activity_corridor_navigation);
 
-        navigationView = findViewById(R.id.navigationView);
-        navigationView.onCreate(savedInstanceState);
-        navigationView.initialize(this);
+            mainDriectionRoute = (DirectionsRoute) getIntent().getSerializableExtra("DirectionsRoute_0");
+            //The MainDirectionRoute must be the first in the ArrayList
+            alternativeDirectionsRoutes.add((DirectionsRoute) getIntent().getSerializableExtra("DirectionsRoute_0"));
+            alternativeDirectionsRoutes.add((DirectionsRoute) getIntent().getSerializableExtra("DirectionsRoute_1"));
+            alternativeDirectionsRoutes.add((DirectionsRoute) getIntent().getSerializableExtra("DirectionsRoute_2"));
+
+            registerReceiver(broadcastReceiver, new IntentFilter("finish_activity"));
+            navigationView = findViewById(amos.corridornavigation.R.id.navigationView);
+            navigationView.onCreate(savedInstanceState);
+            navigationView.initialize(this);
 
     }
 
@@ -105,11 +99,11 @@ public class CorridorNavigationActivity extends AppCompatActivity implements OnN
         super.onDestroy();
         navigationView.onDestroy();
     }
-
+NavigationViewOptions options;
     @Override
     public void onNavigationReady(boolean isRunning) {
 
-        NavigationViewOptions options = NavigationViewOptions.builder()
+         options = NavigationViewOptions.builder()
                 .directionsRoute(mainDriectionRoute)
                 .shouldSimulateRoute(true)
                 .build();
@@ -119,7 +113,6 @@ public class CorridorNavigationActivity extends AppCompatActivity implements OnN
         navigationView.retrieveNavigationMapboxMap().showAlternativeRoutes(true);
 
         navigationView.retrieveNavigationMapboxMap().drawRoutes(alternativeDirectionsRoutes); // Print all Alt-Routes
-
         //navigationView.retrieveNavigationMapboxMap().removeRoute(); // Removes all Alt-Routes
 
 
@@ -134,4 +127,23 @@ public class CorridorNavigationActivity extends AppCompatActivity implements OnN
         //red_router.addRoute(alternativeDirectionsRoutes.get(2));
 
     }
+    public void onClickNaviPause(View view){
+        Intent intent=new Intent();//CorridorNavigationActivity.this, amos.corridornavigation.MainActivity.class);
+        intent.setClassName(this,"amos.corridornavigation.MainActivity");
+        intent.putExtra("naviIsPaused",true);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        startActivity(intent);
+    }
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context arg0, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals("finish_activity")) {
+                finish();
+            }
+        }
+    };
+
+
 }

@@ -21,8 +21,6 @@ import com.mapbox.mapboxsdk.Mapbox;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.services.android.navigation.ui.v5.NavigationLauncher;
-import com.mapbox.services.android.navigation.ui.v5.NavigationLauncherOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +36,6 @@ import timber.log.Timber;
 public class MainActivity extends MapContext
 {
     public static String[] countries;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,8 +44,7 @@ public class MainActivity extends MapContext
 
         initMapView(savedInstanceState);
 
-        final AutoCompleteTextView addressSearchBar = (AutoCompleteTextView)
-                findViewById(R.id.main_searchbar_input);
+        final AutoCompleteTextView addressSearchBar = findViewById(R.id.main_searchbar_input);
 
         addressSearchBar.addTextChangedListener(new TextWatcher() {
             @Override
@@ -180,8 +176,6 @@ public class MainActivity extends MapContext
         routes.add(super.locationMarker.directionsRoutes.get(1));
         routes.add(super.locationMarker.directionsRoutes.get(2));
 
-
-
         //routes.add(super.locationMarker.directionsRoutes.get(0));
         //routes.add(super.locationMarker.directionsRoutes.get(1));
 
@@ -195,13 +189,19 @@ public class MainActivity extends MapContext
 
         // Call this method with Context from within an Activity
         NavigationLauncher.startNavigation(this, options);*/
-
+        Intent intentNavigation = new Intent("finish_activity");
+        sendBroadcast(intentNavigation);
         Intent intent = new Intent(MainActivity.this, CorridorNavigationActivity.class);
         intent.putExtra("DirectionsRoute_0",routes.get(0));
         intent.putExtra("DirectionsRoute_1",routes.get(1));
         intent.putExtra("DirectionsRoute_2",routes.get(2));
-        //intent.putExtra("DirectionsRoute_2",routes.get(2));
         startActivity(intent);
 
+    }
+    public void onClickNaviGoOn(View view){
+        Intent intent=new Intent();
+        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        intent.setClassName(this,"amos.corridornavigation.navigationview.CorridorNavigationActivity");
+        startActivity(intent);
     }
 }

@@ -41,7 +41,7 @@ public class MapContext extends AppCompatActivity implements LocationEngineListe
     protected void initMapView(Bundle savedInstanceState) {
         locationMarker = new Router();
 
-        mapView = findViewById(R.id.navigationView);
+        mapView = findViewById(amos.corridornavigation.R.id.navigationView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
 
